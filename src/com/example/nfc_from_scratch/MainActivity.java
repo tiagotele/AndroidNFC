@@ -103,11 +103,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		listViewRecords = (ListView) findViewById(R.id.listViewRecords);
 		listViewRecords.setClickable(true);
 		listViewRecords.setOnItemClickListener(this);
-		
-		//android.view.View.VISIBLE
-		//android.view.View.android.view.View.INVISIBLE
-		//android.view.View.GONE
-		//listViewRecords.setVisibility(android.view.View.v);
+
 
 		// First listView just for testing :p
 		listOfMessages = new ArrayList<NdefMessage>();
