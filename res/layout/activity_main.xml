@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/linearLayoutListOfMessages"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
+            android:orientation="vertical"
+            android:visibility="visible"
+             >
+
+            <ListView
+                android:id="@+id/listViewMessages"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:background="#c0c0c0" >
+            </ListView>
+        </LinearLayout>
+        
+         <LinearLayout
+            android:id="@+id/linearLayoutListOfRecords"
+            android:layout_width="wrap_content"
+            android:layout_height="300dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+             >
+
+            <ListView
+                android:id="@+id/listViewRecords"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:background="#ffc0c0" >
+            </ListView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <EditText
+                android:id="@+id/editTextTipo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:text="Tipo" >
+
+                <requestFocus />
+            </EditText>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom" >
+
+            <Button
+                android:id="@+id/buttonAdicionarTag"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="Adicionar TAG" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
