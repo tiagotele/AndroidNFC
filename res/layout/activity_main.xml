@@ -42,7 +42,7 @@
                 android:id="@+id/listViewRecords"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
-                android:background="#ffc0c0" >
+                android:background="#c0c0c0" >
             </ListView>
         </LinearLayout>
 

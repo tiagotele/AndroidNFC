@@ -18,13 +18,13 @@ public class RecordAdapter extends BaseAdapter implements OnClickListener {
 
 	private Context context;
 
-    private List<NdefRecord> listOfRecords;
+	private List<NdefRecord> listOfRecords;
 
-    public RecordAdapter(Context context, List<NdefRecord> listOfMessages) {
-        this.context = context;
-        this.listOfRecords = listOfMessages;
-    }
-	
+	public RecordAdapter(Context context, List<NdefRecord> listOfMessages) {
+		this.context = context;
+		this.listOfRecords = listOfMessages;
+	}
+
 	@Override
 	public int getCount() {
 		return listOfRecords.size();
@@ -32,7 +32,7 @@ public class RecordAdapter extends BaseAdapter implements OnClickListener {
 
 	@Override
 	public Object getItem(int index) {
-		
+
 		return listOfRecords.get(index);
 	}
 
@@ -45,18 +45,36 @@ public class RecordAdapter extends BaseAdapter implements OnClickListener {
 	@Override
 	public View getView(int position, View convertView, ViewGroup viewGroup) {
 		NdefRecord entry = listOfRecords.get(position);
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) context
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.message_custom_layout, null);
-        }
-        TextView tvMainText = (TextView) convertView.findViewById(R.id.textViewMainItem);
-        tvMainText.setText("Type: "+entry.toMimeType());
+		if (convertView == null) {
+			LayoutInflater inflater = (LayoutInflater) context
+					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			convertView = inflater
+					.inflate(R.layout.message_custom_layout, null);
+		}
 
-        TextView tvDetailText = (TextView) convertView.findViewById(R.id.textViewDetailItem);
-        tvDetailText.setText("Id: "+entry.getId());
+		TextView tvMainText = (TextView) convertView
+				.findViewById(R.id.textViewMainItem);
+		tvMainText.setText("Type: " + getTypeInStringFormat(entry));
 
-        return convertView;
+		TextView tvDetailText = (TextView) convertView
+				.findViewById(R.id.textViewDetailItem);
+		tvDetailText.setText("Id: " + entry.getId());
+
+		return convertView;
+	}
+
+	private String getTypeInStringFormat(NdefRecord entry) {
+		String type = "Undefined";
+		if (TextRecord.isText(entry)) {
+			type = "Text";
+		}
+		if (UriRecord.isUri(entry)) {
+			type = "Uri";
+		}
+		if (SmartPoster.isPoster(entry)) {
+			type = "Smart Poster";
+		}
+		return type;
 	}
 
 	@Override
