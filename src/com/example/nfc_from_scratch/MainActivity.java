@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	private ArrayList<NdefRecord> listOfRecords;
 
 	EditText editTextTipo;
-	Button buttonAdicionarTag;
+	Button buttonwriteTest,buttonAdicionarURI;
 
 	//Flag to read/write data on nfc tag.
 	// True: escreve na tag
@@ -71,6 +71,9 @@ public class MainActivity extends Activity implements OnClickListener,
 	//and show listview of messages. When listview of messages is backed up this variable
 	//should be false.
 	Boolean flagCloseAppWhenBackIsPressed = true;
+	
+	//RequestCode for activity.
+	private int requestCodeAddUri = 1;
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
 	@Override
@@ -99,8 +102,11 @@ public class MainActivity extends Activity implements OnClickListener,
 
 		// Single components
 		editTextTipo = (EditText) findViewById(R.id.editTextTipo);
-		buttonAdicionarTag = (Button) findViewById(R.id.buttonAdicionarTag);
-		buttonAdicionarTag.setOnClickListener(this);
+		buttonwriteTest = (Button) findViewById(R.id.buttonAdicionarTag);
+		buttonwriteTest.setOnClickListener(this);
+		
+		buttonAdicionarURI = (Button)findViewById(R.id.buttonAdicionarUri);
+		buttonAdicionarURI.setOnClickListener(this);
 
 		linearLayoutMessage = (LinearLayout)findViewById(R.id.linearLayoutListOfMessages);
 		linearLayoutRecord = (LinearLayout)findViewById(R.id.linearLayoutListOfRecords);
@@ -502,12 +508,16 @@ public class MainActivity extends Activity implements OnClickListener,
 	@Override
 	public void onClick(View v) {
 
-		if (v == buttonAdicionarTag) {
+		if (v == buttonwriteTest) {
 			// GravaTag
 			flagWriteTag = true;
 			this.printToast("Coloque o aparelho perto da TAG NFC!");
 		}
-
+		
+		if (v == buttonAdicionarURI) {
+			Intent adicionarUriDialog = new Intent(getApplicationContext(), AddUriDialog.class);
+			startActivityForResult(adicionarUriDialog, requestCodeAddUri );
+		}
 	}
 
 	@Override
@@ -519,9 +529,11 @@ public class MainActivity extends Activity implements OnClickListener,
 		if(linearLayoutMessage.getVisibility()==android.view.View.VISIBLE)
 		{
 			//Hide(gone) listViewMessages
-			linearLayoutMessage.setVisibility(android.view.View.GONE);
 			//Show listViewRecords of index index(parameter)
-			linearLayoutRecord.setVisibility(android.view.View.VISIBLE);
+			showRecordListViewMode();
+			
+			//Clear listViewAdapterRecords before insert
+			listOfRecords.clear();
 			
 			for (int i = 0; i < listOfMessages.get(index).getRecords().length; i++) {
 				listOfRecords.add(listOfMessages.get(index).getRecords()[i]);
@@ -539,20 +551,42 @@ public class MainActivity extends Activity implements OnClickListener,
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		
-		if(flagCloseAppWhenBackIsPressed)
-		{
-			return super.onKeyDown(keyCode, event);
-		}
-		else
-		{
-			//Show layoutItem of messages
-			linearLayoutMessage.setVisibility(android.view.View.VISIBLE);
-			//Hide layoutItem of Records
-			linearLayoutRecord.setVisibility(android.view.View.GONE);			
-			//reset flag
+
+		if (flagCloseAppWhenBackIsPressed) {
+			//return super.onKeyDown(keyCode, event);
+			return true;
+		} else {
+			showMessageListViewMode();
+			// reset flag
 			flagCloseAppWhenBackIsPressed = true;
 			return false;
 		}
+	}
+	
+	/**
+	 * Show gui components when showing NDF Message on screen.
+	 */
+	private void showMessageListViewMode() {
+		// Show layoutItem of messages
+		linearLayoutMessage.setVisibility(android.view.View.VISIBLE);
+		// Hide layoutItem of Records
+		linearLayoutRecord.setVisibility(android.view.View.GONE);
+		
+		editTextTipo.setVisibility(android.view.View.GONE);
+		buttonwriteTest.setVisibility(android.view.View.GONE);
+	}
+
+	/**
+	 * Show gui components when showing NDF Records on screen.
+	 */
+	private void showRecordListViewMode() {
+		// Show layoutItem of messages
+		linearLayoutMessage.setVisibility(android.view.View.GONE);
+		// Hide layoutItem of Records
+		linearLayoutRecord.setVisibility(android.view.View.VISIBLE);
+		
+		//Show button for add new record
+		editTextTipo.setVisibility(android.view.View.VISIBLE);
+		buttonwriteTest.setVisibility(android.view.View.VISIBLE);
 	}
 }

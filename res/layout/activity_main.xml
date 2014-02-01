@@ -56,7 +56,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:text="Tipo" >
+                android:text="Tipo"
+                android:visibility="gone"
+                 >
 
                 <requestFocus />
             </EditText>
@@ -65,14 +67,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom" >
+            android:gravity="bottom"
+            android:orientation="vertical" 
+            >
 
             <Button
                 android:id="@+id/buttonAdicionarTag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:text="Adicionar TAG" />
+                android:text="Write testing on NFC TAG"
+                android:visibility="gone"
+                 />
+            
+            <Button
+                android:id="@+id/buttonAdicionarUri"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="Add uri"
+                
+                 />
         </LinearLayout>
     </LinearLayout>
 
