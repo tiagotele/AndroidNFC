@@ -41,6 +41,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	private PendingIntent mPendingIntent;
 	private NdefMessage mNdefPushMessage;
 	private IntentFilter[] mWriteTagFilters;
+	private int changinCode;
 	
 
 	// ListViewers and related objetc
