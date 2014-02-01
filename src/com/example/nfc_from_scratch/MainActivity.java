@@ -236,8 +236,8 @@ public class MainActivity extends Activity implements OnClickListener,
 							e.printStackTrace();
 						}
 					}
-					writeTag(msgs[0], detectedTag);
-					// writeTag(detectedTag);
+					//writeTag(msgs[0], detectedTag);
+					 writeTag(detectedTag);
 					/*
 					 * NdefRecord record = NdefRecord.createUri("www.bing.com");
 					 * addRecordToTag(detectedTag, msgs[0], record);
@@ -400,7 +400,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				NdefRecord r0 = NdefRecord.createUri("www.duck.com");
 				// NdefRecord r1 = NdefRecord.createUri("www.google.com");
 				NdefRecord records[] = new NdefRecord[1];
-				records[0] = r0;
+				records[0] = TextRecord.createNewTextRecord("Scuusa se Teago");
 				// records[1] = r1;
 				NdefMessage testNdef = new NdefMessage(records);
 				ndef.writeNdefMessage(testNdef);
@@ -502,15 +502,43 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View view, int index, long id){
-		//Hide(gone) listViewMessages
-		linearLayoutMessage.setVisibility(android.view.View.GONE);
-		//Show listViewRecords of index index(parameter)
-		linearLayoutRecord.setVisibility(android.view.View.VISIBLE);
+	
+		//BFIGX: App is not crashing when user press on listView of Records
+		//TODO refactor this :p
 		
-		for (int i = 0; i < listOfMessages.get(index).getRecords().length; i++) {
-			listOfRecords.add(listOfMessages.get(index).getRecords()[i]);
+		if(linearLayoutMessage.getVisibility()==android.view.View.VISIBLE)
+		{
+			//Hide(gone) listViewMessages
+			linearLayoutMessage.setVisibility(android.view.View.GONE);
+			//Show listViewRecords of index index(parameter)
+			linearLayoutRecord.setVisibility(android.view.View.VISIBLE);
+			
+			for (int i = 0; i < listOfMessages.get(index).getRecords().length; i++) {
+				listOfRecords.add(listOfMessages.get(index).getRecords()[i]);
+			}
+			listViewAdapterRecords.notifyDataSetChanged();
 		}
-		listViewAdapterRecords.notifyDataSetChanged();
+		
+		if(linearLayoutRecord.getVisibility()==android.view.View.VISIBLE)
+		{
+			//Do nothing
+		}
 
+	}
+	
+	public NdefRecord getTextRecord()
+	{
+
+		
+		// record to launch Play Store if app is not installed
+        // record that contains our custom "retro console" game data, using custom MIME_TYPE
+        String mimeType = "text/nfc-service-tag";
+        byte[] payload = "textToBeWritten".getBytes(Charset.forName("UTF-8"));
+        byte[] mimeBytes = mimeType.getBytes(Charset.forName("UTF-8"));
+        NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, 
+        		NdefRecord.RTD_TEXT,
+                new byte[0], 
+                "testing".getBytes());//new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
+        return record;
 	}
 }
