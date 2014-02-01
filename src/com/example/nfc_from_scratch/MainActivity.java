@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -58,9 +59,18 @@ public class MainActivity extends Activity implements OnClickListener,
 	EditText editTextTipo;
 	Button buttonAdicionarTag;
 
+	//Flag to read/write data on nfc tag.
 	// True: escreve na tag
-	// False: apenas l� o conte�do
-	Boolean gravarTag = false;
+	// False: apenas lê o conteúdo
+	Boolean flagWriteTag = false;
+	
+	//Flag that indicates if app should back whenever back button is pressed
+	//It should close application if listView showed is listView of messages
+	//True: close app when back is pressed.
+	//False: don't close app when back is pressed. It should hide listview of records
+	//and show listview of messages. When listview of messages is backed up this variable
+	//should be false.
+	Boolean flagCloseAppWhenBackIsPressed = true;
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
 	@Override
@@ -208,7 +218,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	private void resolveIntent(Intent intent) {
 
-		if (gravarTag) {
+		if (flagWriteTag) {
 			// GRAVA TAG
 			String action = intent.getAction();
 			if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
@@ -236,8 +246,8 @@ public class MainActivity extends Activity implements OnClickListener,
 							e.printStackTrace();
 						}
 					}
-					//writeTag(msgs[0], detectedTag);
-					 writeTag(detectedTag);
+					writeTag(msgs[0], detectedTag);
+					 //writeTag(detectedTag);
 					/*
 					 * NdefRecord record = NdefRecord.createUri("www.bing.com");
 					 * addRecordToTag(detectedTag, msgs[0], record);
@@ -312,7 +322,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		}
 
 		// "RESETA variável para não gravar sempre
-		gravarTag = false;
+		flagWriteTag = false;
 
 	}
 
@@ -494,7 +504,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
 		if (v == buttonAdicionarTag) {
 			// GravaTag
-			gravarTag = true;
+			flagWriteTag = true;
 			this.printToast("Coloque o aparelho perto da TAG NFC!");
 		}
 
@@ -517,28 +527,32 @@ public class MainActivity extends Activity implements OnClickListener,
 				listOfRecords.add(listOfMessages.get(index).getRecords()[i]);
 			}
 			listViewAdapterRecords.notifyDataSetChanged();
+			
+			flagCloseAppWhenBackIsPressed = false;
 		}
 		
 		if(linearLayoutRecord.getVisibility()==android.view.View.VISIBLE)
 		{
 			//Do nothing
 		}
-
 	}
 	
-	public NdefRecord getTextRecord()
-	{
-
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		
-		// record to launch Play Store if app is not installed
-        // record that contains our custom "retro console" game data, using custom MIME_TYPE
-        String mimeType = "text/nfc-service-tag";
-        byte[] payload = "textToBeWritten".getBytes(Charset.forName("UTF-8"));
-        byte[] mimeBytes = mimeType.getBytes(Charset.forName("UTF-8"));
-        NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, 
-        		NdefRecord.RTD_TEXT,
-                new byte[0], 
-                "testing".getBytes());//new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
-        return record;
+		if(flagCloseAppWhenBackIsPressed)
+		{
+			return super.onKeyDown(keyCode, event);
+		}
+		else
+		{
+			//Show layoutItem of messages
+			linearLayoutMessage.setVisibility(android.view.View.VISIBLE);
+			//Hide layoutItem of Records
+			linearLayoutRecord.setVisibility(android.view.View.GONE);			
+			//reset flag
+			flagCloseAppWhenBackIsPressed = true;
+			return false;
+		}
 	}
 }

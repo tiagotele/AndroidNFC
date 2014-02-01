@@ -86,10 +86,14 @@ public class TextRecord  implements ParsedNdefRecord{
     }
     
     /**
+     * TODO: fix "Error parsing NDFE Text Record"
+     * 
      * Create a new textRecord with UTF-8 encoding.
      * 
      * @param textToBeStored 
      * @return record to be written on NFC Tag
+     * 
+     * 
      */
     public static NdefRecord createNewTextRecord(String textToBeStored)
     {
