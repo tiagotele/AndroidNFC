@@ -93,15 +93,29 @@ public class TextRecord  implements ParsedNdefRecord{
      */
     public static NdefRecord createNewTextRecord(String textToBeStored)
     {
-    	// record to launch Play Store if app is not installed
-        // record that contains our custom "retro console" game data, using custom MIME_TYPE
-        String mimeType = "text/nfc-service-tag";
-        byte[] payload = "textToBeWritten".getBytes(Charset.forName("US-ASCII"));
-        byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
-        NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, 
-        		NdefRecord.RTD_TEXT,
-                new byte[0], 
-                textToBeStored.getBytes());//new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
-        return record;
+
+    	try {
+    		byte[] payload = textToBeStored.getBytes(Charset.forName("US-ASCII"));
+    		String textEncoding = ((payload[0] & 0200) == 0) ? "UTF-8" : "UTF-16";
+    		int languageCodeLength = payload[0] & 0077;
+    		String languageCode = new String(payload, 1, languageCodeLength,
+    				"US-ASCII");
+    		String text = new String(payload, languageCodeLength + 1,
+    				payload.length - languageCodeLength - 1, textEncoding);
+
+        	// record to launch Play Store if app is not installed
+            // record that contains our custom "retro console" game data, using custom MIME_TYPE
+            String mimeType = "text/nfc-service-tag";
+            //byte[] payload = "textToBeWritten".getBytes(Charset.forName("US-ASCII"));
+            byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
+            NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, 
+            		NdefRecord.RTD_TEXT,
+                    new byte[0], 
+                    text.getBytes());//new NdefRecord(NdefRecord.TNF_MIME_MEDIA, mimeBytes, new byte[0], payload);
+            return record;
+		} catch (Exception e) {
+			return null;
+		}
+    	
     }
 }
