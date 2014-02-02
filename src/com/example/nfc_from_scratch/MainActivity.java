@@ -74,6 +74,10 @@ public class MainActivity extends Activity implements OnClickListener,
 	
 	//RequestCode for activity.
 	private int requestCodeAddUri = 1;
+	private NdefMessage arrayOfRecordsGlobal = null;
+	private Tag detectedTagGlobal = null;
+	private int indexOfMessageToBeStored=-1;
+	private String uriFromUser;
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
 	@Override
@@ -225,8 +229,10 @@ public class MainActivity extends Activity implements OnClickListener,
 	private void resolveIntent(Intent intent) {
 
 		if (flagWriteTag) {
+			
+			addUriRecordToMessage(uriFromUser);
 			// GRAVA TAG
-			String action = intent.getAction();
+			/*String action = intent.getAction();
 			if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
 					|| NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
 					|| NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
@@ -234,6 +240,8 @@ public class MainActivity extends Activity implements OnClickListener,
 
 				Tag detectedTag = intent
 						.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+				
+				detectedTagGlobal = detectedTag;
 
 				Parcelable[] rawMsgs = intent
 						.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -252,19 +260,20 @@ public class MainActivity extends Activity implements OnClickListener,
 							e.printStackTrace();
 						}
 					}
-					writeTag(msgs[0], detectedTag);
+					arrayOfRecordsGlobal = msgs[0];
+					//writeTag(msgs[0], detectedTag);
 					 //writeTag(detectedTag);
-					/*
-					 * NdefRecord record = NdefRecord.createUri("www.bing.com");
-					 * addRecordToTag(detectedTag, msgs[0], record);
-					 */
+					
+					//NdefRecord record = NdefRecord.createUri("www.bing.com");
+					//addRecordToTag(detectedTag, msgs[0], record);
+					
 				}
 
 			} else {
 				printToast("Not tag or tech or ndef discovered");
 				// Unknown tag type
 
-			}
+			}*/
 		} else {
 			// LÊ TAG
 			String action = intent.getAction();
@@ -273,6 +282,11 @@ public class MainActivity extends Activity implements OnClickListener,
 					|| NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
 				printToast("tag or tech or ndef discovered");
 
+				Tag detectedTag = intent
+						.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+				
+				detectedTagGlobal = detectedTag;
+				
 				Parcelable[] rawMsgs = intent
 						.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 				NdefMessage[] messages;
@@ -457,7 +471,8 @@ public class MainActivity extends Activity implements OnClickListener,
 				records[0] = r0;
 				records[1] = r1;
 				NdefMessage testNdef = new NdefMessage(records);
-				ndef.writeNdefMessage(testNdef);
+				//ndef.writeNdefMessage(testNdef);
+				ndef.writeNdefMessage(message);
 				// ndef.writeNdefMessage(message);
 				/*
 				 * if(writeProtect) ndef.makeReadOnly(); mess =
@@ -485,6 +500,31 @@ public class MainActivity extends Activity implements OnClickListener,
 			mess = "Failed to write tag";
 			return new WriteResponse(0, mess);
 		}
+	}
+	
+	private void addUriRecordToMessage(String uriFromUser) {
+		
+		try {
+			// Create uri record with parameter of this function
+			NdefRecord recordToBeAddedOnNFCTag = NdefRecord.createUri(uriFromUser);
+			// Add new record to arrayOfRecords
+			NdefRecord[] newArrayOfRecords = new NdefRecord[listOfMessages.get(
+					this.indexOfMessageToBeStored).getRecords().length + 1];
+			for (int i = 0; i < listOfMessages.get(this.indexOfMessageToBeStored)
+					.getRecords().length; i++) {
+				newArrayOfRecords[i] = listOfMessages.get(
+						this.indexOfMessageToBeStored).getRecords()[i];
+			}
+			newArrayOfRecords[listOfMessages.get(this.indexOfMessageToBeStored)
+					.getRecords().length ] = recordToBeAddedOnNFCTag;
+			// Add the new arrayOfRecords to clicked message
+			NdefMessage newMessage = new NdefMessage(newArrayOfRecords);
+			// Store on nfc TAG
+			writeTag(newMessage, detectedTagGlobal);
+		} catch (Exception e) {
+			Log.e("ERROR", e.getMessage());
+		}
+		
 	}
 
 	private class WriteResponse {
@@ -523,7 +563,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View view, int index, long id){
 	
-		//BFIGX: App is not crashing when user press on listView of Records
+		//BFIX: App is not crashing when user press on listView of Records
 		//TODO refactor this :p
 		
 		if(linearLayoutMessage.getVisibility()==android.view.View.VISIBLE)
@@ -534,7 +574,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			
 			//Clear listViewAdapterRecords before insert
 			listOfRecords.clear();
-			
+			indexOfMessageToBeStored = index;
 			for (int i = 0; i < listOfMessages.get(index).getRecords().length; i++) {
 				listOfRecords.add(listOfMessages.get(index).getRecords()[i]);
 			}
@@ -598,9 +638,17 @@ public class MainActivity extends Activity implements OnClickListener,
 			
 			if (resultCode == RESULT_OK) {
 				//Pega uri do usuário por intent
-				String uriFromUser = data.getStringExtra(getResources().getString(R.string.URI_FROM_USER));
-				printToast(uriFromUser);
+				uriFromUser = data.getStringExtra(getResources().getString(R.string.URI_FROM_USER));
+				//addUriRecordToMessage(uriFromUser);
+				flagWriteTag = true;
+			}
+			
+			if(resultCode == RESULT_CANCELED)
+			{
+				flagWriteTag = false;
 			}
 		}
 	}
+
+	
 }
