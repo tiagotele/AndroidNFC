@@ -10,4 +10,6 @@
     <string name="nfc_disabled">NFC is not enabled. Please go to the wireless settings to enable it.</string>
     <string name="title_activity_add_uri_dialog">AddUriDialog</string>
 
+    <string name="URI_FROM_USER">URI_FROM_USER</string>
+    
 </resources>

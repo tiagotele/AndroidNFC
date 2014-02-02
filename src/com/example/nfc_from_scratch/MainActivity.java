@@ -589,4 +589,18 @@ public class MainActivity extends Activity implements OnClickListener,
 		editTextTipo.setVisibility(android.view.View.VISIBLE);
 		buttonwriteTest.setVisibility(android.view.View.VISIBLE);
 	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == requestCodeAddUri) {
+			
+			if (resultCode == RESULT_OK) {
+				//Pega uri do usuário por intent
+				String uriFromUser = data.getStringExtra(getResources().getString(R.string.URI_FROM_USER));
+				printToast(uriFromUser);
+			}
+		}
+	}
 }
