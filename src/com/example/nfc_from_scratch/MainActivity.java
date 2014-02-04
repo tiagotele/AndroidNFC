@@ -43,7 +43,6 @@ public class MainActivity extends Activity implements OnClickListener,
 	private NdefMessage mNdefPushMessage;
 	private IntentFilter[] mWriteTagFilters;
 	private int changinCode;
-	
 
 	// ListViewers and related objetc
 	MessageAdapter listViewAdapterMessage;
@@ -52,31 +51,34 @@ public class MainActivity extends Activity implements OnClickListener,
 	ListView listViewRecords;
 	LinearLayout linearLayoutMessage;
 	LinearLayout linearLayoutRecord;
-	
+	LinearLayout linearLayoutInitialMessage;
+
 	private ArrayList<NdefMessage> listOfMessages;
 	private ArrayList<NdefRecord> listOfRecords;
 
 	EditText editTextTipo;
-	Button buttonwriteTest,buttonAdicionarURI;
+	Button buttonwriteTest, buttonAdicionarURI;
 
-	//Flag to read/write data on nfc tag.
+	// Flag to read/write data on nfc tag.
 	// True: escreve na tag
 	// False: apenas lê o conteúdo
 	Boolean flagWriteTag = false;
-	
-	//Flag that indicates if app should back whenever back button is pressed
-	//It should close application if listView showed is listView of messages
-	//True: close app when back is pressed.
-	//False: don't close app when back is pressed. It should hide listview of records
-	//and show listview of messages. When listview of messages is backed up this variable
-	//should be false.
+
+	// Flag that indicates if app should back whenever back button is pressed
+	// It should close application if listView showed is listView of messages
+	// True: close app when back is pressed.
+	// False: don't close app when back is pressed. It should hide listview of
+	// records
+	// and show listview of messages. When listview of messages is backed up
+	// this variable
+	// should be false.
 	Boolean flagCloseAppWhenBackIsPressed = true;
-	
-	//RequestCode for activity.
+
+	// RequestCode for activity.
 	private int requestCodeAddUri = 1;
 	private NdefMessage arrayOfRecordsGlobal = null;
 	private Tag detectedTagGlobal = null;
-	private int indexOfMessageToBeStored=-1;
+	private int indexOfMessageToBeStored = -1;
 	private String uriFromUser;
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD_MR1)
@@ -108,49 +110,34 @@ public class MainActivity extends Activity implements OnClickListener,
 		editTextTipo = (EditText) findViewById(R.id.editTextTipo);
 		buttonwriteTest = (Button) findViewById(R.id.buttonAdicionarTag);
 		buttonwriteTest.setOnClickListener(this);
-		
-		buttonAdicionarURI = (Button)findViewById(R.id.buttonAdicionarUri);
+
+		buttonAdicionarURI = (Button) findViewById(R.id.buttonAdicionarUri);
 		buttonAdicionarURI.setOnClickListener(this);
 
-		linearLayoutMessage = (LinearLayout)findViewById(R.id.linearLayoutListOfMessages);
-		linearLayoutRecord = (LinearLayout)findViewById(R.id.linearLayoutListOfRecords);
-		
+		linearLayoutMessage = (LinearLayout) findViewById(R.id.linearLayoutListOfMessages);
+		linearLayoutRecord = (LinearLayout) findViewById(R.id.linearLayoutListOfRecords);
+		linearLayoutInitialMessage = (LinearLayout) findViewById(R.id.linearLayoutInitialMessage);
+
 		// ListViewers
 		listViewMessages = (ListView) findViewById(R.id.listViewMessages);
 		listViewMessages.setClickable(true);
 		listViewMessages.setOnItemClickListener(this);
-		
+
 		listViewRecords = (ListView) findViewById(R.id.listViewRecords);
 		listViewRecords.setClickable(true);
 		listViewRecords.setOnItemClickListener(this);
 
-
 		// First listView just for testing :p
 		listOfMessages = new ArrayList<NdefMessage>();
 		listOfRecords = new ArrayList<NdefRecord>();
-		
-		try {
-
-			NdefRecord r0 = NdefRecord.createUri("www.google.com");
-			NdefRecord r1 = NdefRecord.createUri("www.yahoo.com");
-			NdefRecord records[] = new NdefRecord[2];
-			records[0] = r0;
-			records[1] = r1;
-			NdefMessage testNdef = new NdefMessage(records);
-
-			// NdefMessage message = new NdefMessage(records);
-			listOfMessages.add(testNdef);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		listViewAdapterMessage = new MessageAdapter(this, listOfMessages);
-		listViewAdapterRecords = new RecordAdapter(this,listOfRecords);
+		listViewAdapterRecords = new RecordAdapter(this, listOfRecords);
 
 		listViewMessages.setAdapter(listViewAdapterMessage);
 		listViewRecords.setAdapter(listViewAdapterRecords);
 
+		showGUIInitMode();
 	}
 
 	private NdefRecord newTextRecord(String text, Locale locale,
@@ -202,8 +189,6 @@ public class MainActivity extends Activity implements OnClickListener,
 			mAdapter.enableForegroundNdefPush(this, mNdefPushMessage);
 		}
 		if (listViewAdapterMessage != null) {
-			// messageAdapter.notify();
-			// messageAdapter.notifyAll();
 			listViewAdapterMessage.notifyDataSetChanged();
 		}
 
@@ -223,57 +208,49 @@ public class MainActivity extends Activity implements OnClickListener,
 		setIntent(intent);
 		printToast("New intent");
 		resolveIntent(intent);
+		showMessageListViewMode();
 
 	}
 
 	private void resolveIntent(Intent intent) {
 
 		if (flagWriteTag) {
-			
+
 			addUriRecordToMessage(uriFromUser);
 			// GRAVA TAG
-			/*String action = intent.getAction();
-			if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
-					|| NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
-					|| NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-				printToast("tag or tech or ndef discovered");
-
-				Tag detectedTag = intent
-						.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-				
-				detectedTagGlobal = detectedTag;
-
-				Parcelable[] rawMsgs = intent
-						.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-				NdefMessage[] msgs;
-				if (rawMsgs != null) {
-					msgs = new NdefMessage[rawMsgs.length];
-					for (int i = 0; i < rawMsgs.length; i++) {
-						msgs[i] = (NdefMessage) rawMsgs[i];
-						try {
-							setTipo(new String(
-									msgs[0].getRecords()[0].getPayload(),
-									"UTF-8"));
-						} catch (UnsupportedEncodingException e) {
-							// TODO Auto-generated catch block
-							setTipo(e.getMessage());
-							e.printStackTrace();
-						}
-					}
-					arrayOfRecordsGlobal = msgs[0];
-					//writeTag(msgs[0], detectedTag);
-					 //writeTag(detectedTag);
-					
-					//NdefRecord record = NdefRecord.createUri("www.bing.com");
-					//addRecordToTag(detectedTag, msgs[0], record);
-					
-				}
-
-			} else {
-				printToast("Not tag or tech or ndef discovered");
-				// Unknown tag type
-
-			}*/
+			/*
+			 * String action = intent.getAction(); if
+			 * (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action) ||
+			 * NfcAdapter.ACTION_TECH_DISCOVERED.equals(action) ||
+			 * NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+			 * printToast("tag or tech or ndef discovered");
+			 * 
+			 * Tag detectedTag = intent
+			 * .getParcelableExtra(NfcAdapter.EXTRA_TAG);
+			 * 
+			 * detectedTagGlobal = detectedTag;
+			 * 
+			 * Parcelable[] rawMsgs = intent
+			 * .getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+			 * NdefMessage[] msgs; if (rawMsgs != null) { msgs = new
+			 * NdefMessage[rawMsgs.length]; for (int i = 0; i < rawMsgs.length;
+			 * i++) { msgs[i] = (NdefMessage) rawMsgs[i]; try { setTipo(new
+			 * String( msgs[0].getRecords()[0].getPayload(), "UTF-8")); } catch
+			 * (UnsupportedEncodingException e) { // TODO Auto-generated catch
+			 * block setTipo(e.getMessage()); e.printStackTrace(); } }
+			 * arrayOfRecordsGlobal = msgs[0]; //writeTag(msgs[0], detectedTag);
+			 * //writeTag(detectedTag);
+			 * 
+			 * //NdefRecord record = NdefRecord.createUri("www.bing.com");
+			 * //addRecordToTag(detectedTag, msgs[0], record);
+			 * 
+			 * }
+			 * 
+			 * } else { printToast("Not tag or tech or ndef discovered"); //
+			 * Unknown tag type
+			 * 
+			 * }
+			 */
 		} else {
 			// LÊ TAG
 			String action = intent.getAction();
@@ -284,9 +261,9 @@ public class MainActivity extends Activity implements OnClickListener,
 
 				Tag detectedTag = intent
 						.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-				
+
 				detectedTagGlobal = detectedTag;
-				
+
 				Parcelable[] rawMsgs = intent
 						.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 				NdefMessage[] messages;
@@ -471,7 +448,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				records[0] = r0;
 				records[1] = r1;
 				NdefMessage testNdef = new NdefMessage(records);
-				//ndef.writeNdefMessage(testNdef);
+				// ndef.writeNdefMessage(testNdef);
 				ndef.writeNdefMessage(message);
 				// ndef.writeNdefMessage(message);
 				/*
@@ -501,22 +478,23 @@ public class MainActivity extends Activity implements OnClickListener,
 			return new WriteResponse(0, mess);
 		}
 	}
-	
+
 	private void addUriRecordToMessage(String uriFromUser) {
-		
+
 		try {
 			// Create uri record with parameter of this function
-			NdefRecord recordToBeAddedOnNFCTag = NdefRecord.createUri(uriFromUser);
+			NdefRecord recordToBeAddedOnNFCTag = NdefRecord
+					.createUri(uriFromUser);
 			// Add new record to arrayOfRecords
 			NdefRecord[] newArrayOfRecords = new NdefRecord[listOfMessages.get(
 					this.indexOfMessageToBeStored).getRecords().length + 1];
-			for (int i = 0; i < listOfMessages.get(this.indexOfMessageToBeStored)
-					.getRecords().length; i++) {
+			for (int i = 0; i < listOfMessages.get(
+					this.indexOfMessageToBeStored).getRecords().length; i++) {
 				newArrayOfRecords[i] = listOfMessages.get(
 						this.indexOfMessageToBeStored).getRecords()[i];
 			}
 			newArrayOfRecords[listOfMessages.get(this.indexOfMessageToBeStored)
-					.getRecords().length ] = recordToBeAddedOnNFCTag;
+					.getRecords().length] = recordToBeAddedOnNFCTag;
 			// Add the new arrayOfRecords to clicked message
 			NdefMessage newMessage = new NdefMessage(newArrayOfRecords);
 			// Store on nfc TAG
@@ -524,7 +502,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		} catch (Exception e) {
 			Log.e("ERROR", e.getMessage());
 		}
-		
+
 	}
 
 	private class WriteResponse {
@@ -553,48 +531,46 @@ public class MainActivity extends Activity implements OnClickListener,
 			flagWriteTag = true;
 			this.printToast("Coloque o aparelho perto da TAG NFC!");
 		}
-		
+
 		if (v == buttonAdicionarURI) {
-			Intent adicionarUriDialog = new Intent(getApplicationContext(), AddUriDialog.class);
-			startActivityForResult(adicionarUriDialog, requestCodeAddUri );
+			Intent adicionarUriDialog = new Intent(getApplicationContext(),
+					AddUriDialog.class);
+			startActivityForResult(adicionarUriDialog, requestCodeAddUri);
 		}
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View view, int index, long id){
-	
-		//BFIX: App is not crashing when user press on listView of Records
-		//TODO refactor this :p
-		
-		if(linearLayoutMessage.getVisibility()==android.view.View.VISIBLE)
-		{
-			//Hide(gone) listViewMessages
-			//Show listViewRecords of index index(parameter)
+	public void onItemClick(AdapterView<?> arg0, View view, int index, long id) {
+
+		// BFIX: App is not crashing when user press on listView of Records
+		// TODO refactor this :p
+
+		if (linearLayoutMessage.getVisibility() == android.view.View.VISIBLE) {
+			// Hide(gone) listViewMessages
+			// Show listViewRecords of index index(parameter)
 			showRecordListViewMode();
-			
-			//Clear listViewAdapterRecords before insert
+
+			// Clear listViewAdapterRecords before insert
 			listOfRecords.clear();
 			indexOfMessageToBeStored = index;
 			for (int i = 0; i < listOfMessages.get(index).getRecords().length; i++) {
 				listOfRecords.add(listOfMessages.get(index).getRecords()[i]);
 			}
 			listViewAdapterRecords.notifyDataSetChanged();
-			
+
 			flagCloseAppWhenBackIsPressed = false;
 		}
-		
-		if(linearLayoutRecord.getVisibility()==android.view.View.VISIBLE)
-		{
-			//Do nothing
+
+		if (linearLayoutRecord.getVisibility() == android.view.View.VISIBLE) {
+			// Do nothing
 		}
 	}
-	
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 
 		if (flagCloseAppWhenBackIsPressed) {
-			//return super.onKeyDown(keyCode, event);
-			return true;
+			return super.onKeyDown(keyCode, event);
 		} else {
 			showMessageListViewMode();
 			// reset flag
@@ -602,53 +578,64 @@ public class MainActivity extends Activity implements OnClickListener,
 			return false;
 		}
 	}
-	
+
+	private void showGUIInitMode() {
+		linearLayoutInitialMessage.setVisibility(android.view.View.VISIBLE);
+		linearLayoutMessage.setVisibility(android.view.View.GONE);
+		linearLayoutRecord.setVisibility(android.view.View.GONE);
+
+		editTextTipo.setVisibility(android.view.View.GONE);
+		buttonwriteTest.setVisibility(android.view.View.GONE);
+		buttonAdicionarURI.setVisibility(android.view.View.GONE);
+	}
+
 	/**
 	 * Show gui components when showing NDF Message on screen.
 	 */
 	private void showMessageListViewMode() {
-		// Show layoutItem of messages
+		linearLayoutInitialMessage.setVisibility(android.view.View.GONE);
 		linearLayoutMessage.setVisibility(android.view.View.VISIBLE);
 		// Hide layoutItem of Records
 		linearLayoutRecord.setVisibility(android.view.View.GONE);
-		
+
 		editTextTipo.setVisibility(android.view.View.GONE);
 		buttonwriteTest.setVisibility(android.view.View.GONE);
+		buttonAdicionarURI.setVisibility(android.view.View.GONE);
 	}
 
 	/**
 	 * Show gui components when showing NDF Records on screen.
 	 */
 	private void showRecordListViewMode() {
-		// Show layoutItem of messages
+		linearLayoutInitialMessage.setVisibility(android.view.View.GONE);
 		linearLayoutMessage.setVisibility(android.view.View.GONE);
 		// Hide layoutItem of Records
 		linearLayoutRecord.setVisibility(android.view.View.VISIBLE);
-		
-		//Show button for add new record
+
+		// Show button for add new record
 		editTextTipo.setVisibility(android.view.View.VISIBLE);
 		buttonwriteTest.setVisibility(android.view.View.VISIBLE);
+		buttonAdicionarURI.setVisibility(android.view.View.VISIBLE);
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
 		if (requestCode == requestCodeAddUri) {
-			
+
 			if (resultCode == RESULT_OK) {
-				//Pega uri do usuário por intent
-				uriFromUser = data.getStringExtra(getResources().getString(R.string.URI_FROM_USER));
-				//addUriRecordToMessage(uriFromUser);
+				// Pega uri do usuário por intent
+				uriFromUser = data.getStringExtra(getResources().getString(
+						R.string.URI_FROM_USER));
+				// addUriRecordToMessage(uriFromUser);
 				flagWriteTag = true;
 			}
-			
-			if(resultCode == RESULT_CANCELED)
-			{
+
+			if (resultCode == RESULT_CANCELED) {
 				flagWriteTag = false;
 			}
 		}
 	}
 
-	
 }
