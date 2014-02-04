@@ -61,12 +61,37 @@ public final class R {
         public static final int main=0x7f070001;
     }
     public static final class string {
-        public static final int URI_FROM_USER=0x7f050008;
+        /**  STRING KEYS FOR COMMUNICATION BETWEEN INTENTS 
+         */
+        public static final int URI_FROM_USER=0x7f05000f;
         public static final int action_settings=0x7f050001;
+        public static final int add_uri_cancel_button=0x7f050013;
+        /**  USED IN ADD URI DIALOG ACTIVITY 
+         */
+        public static final int add_uri_dialog_title=0x7f050010;
+        public static final int add_uri_message=0x7f050011;
+        public static final int add_uri_ok_button=0x7f050012;
+        /**  WHOLE PROJECT 
+         */
         public static final int app_name=0x7f050000;
+        public static final int buttonTextAddUri=0x7f05000a;
+        /**  BUTTONS TEXT 
+         */
+        public static final int buttonTextWriteTestOnNFCTag=0x7f050009;
+        public static final int custom_layout_id=0x7f05000e;
+        public static final int custom_layout_number_of_records=0x7f05000c;
+        /**  CUSTOM LAYOUT TEXT 
+ On Message "view" 
+         */
+        public static final int custom_layout_text_Size=0x7f05000b;
+        public static final int custom_layout_type=0x7f05000d;
         public static final int error=0x7f050004;
         public static final int hello_world=0x7f050002;
         public static final int intro_message=0x7f050003;
+        /**  USED IN MAIN ACTIVITY 
+ MESSAGES 
+         */
+        public static final int message_asking_user_put_phont_to_nfc_tag=0x7f050008;
         public static final int nfc_disabled=0x7f050006;
         public static final int no_nfc=0x7f050005;
         public static final int title_activity_add_uri_dialog=0x7f050007;

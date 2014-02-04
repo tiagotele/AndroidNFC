@@ -53,10 +53,10 @@ public class MessageAdapter extends BaseAdapter implements OnClickListener {
             convertView = inflater.inflate(R.layout.message_custom_layout, null);
         }
         TextView tvMainText = (TextView) convertView.findViewById(R.id.textViewMainItem);
-        tvMainText.setText("Size: "+entry.getByteArrayLength());
+        tvMainText.setText(context.getResources().getString(R.string.custom_layout_text_Size)+entry.getByteArrayLength());
 
         TextView tvDetailText = (TextView) convertView.findViewById(R.id.textViewDetailItem);
-        tvDetailText.setText("Number of Records: "+entry.getRecords().length);
+        tvDetailText.setText(context.getResources().getString(R.string.custom_layout_number_of_records)+entry.getRecords().length);
 
         return convertView;
 	}

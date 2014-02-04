@@ -54,11 +54,11 @@ public class RecordAdapter extends BaseAdapter implements OnClickListener {
 
 		TextView tvMainText = (TextView) convertView
 				.findViewById(R.id.textViewMainItem);
-		tvMainText.setText("Type: " + getTypeInStringFormat(entry));
+		tvMainText.setText(context.getResources().getString(R.string.custom_layout_type) + getTypeInStringFormat(entry));
 
 		TextView tvDetailText = (TextView) convertView
 				.findViewById(R.id.textViewDetailItem);
-		tvDetailText.setText("Id: " + entry.getId());
+		tvDetailText.setText(context.getResources().getString(R.string.custom_layout_id) + entry.getId());
 
 		return convertView;
 	}

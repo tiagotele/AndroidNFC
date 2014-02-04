@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Type the uri:"
+            android:text="@string/add_uri_message"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <EditText
@@ -32,32 +32,32 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal" 
+            android:baselineAligned="false"
+            >
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent" 
-                android:layout_weight="1"
-                >
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
 
                 <Button
                     android:id="@+id/buttonAddUriFromUserAdd"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="Add" />
+                    android:text="@string/add_uri_ok_button" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent" 
-                android:layout_weight="1"
-                >
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
 
                 <Button
                     android:id="@+id/buttonAddUriFromUserCancel"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="Cancel" />
+                    android:text="@string/add_uri_cancel_button" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
